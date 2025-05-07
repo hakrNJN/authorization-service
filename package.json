@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-"scripts": {
+  "scripts": {
     "start": "node dist/main.js",
     "dev": "ts-node-dev --watch --respawn --transpile-only --env-file=.env.example src/main.ts",
     "build": "tsc",
@@ -21,9 +21,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.5.0",
+  "packageManager": "pnpm@10.10.0",
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.799.0",
+    "@aws-sdk/client-dynamodb": "^3.804.0",
     "@casl/ability": "^6.7.3",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
