@@ -6,12 +6,14 @@ import { IAuthorizationService } from './application/interfaces/IAuthorizationSe
 import { IConfigService } from './application/interfaces/IConfigService';
 import { ILogger } from './application/interfaces/ILogger';
 import { IPolicySourceAdapter } from './application/interfaces/IPolicySourceAdapter'; // Import new interface
+import { IRegoEngine } from './application/interfaces/IRegoEngine';
 
 // --- Import Implementations ---
 // Infrastructure
 import { HttpPolicySourceAdapter } from './infrastructure/adapters/HttpPolicySourceAdapter'; // Import new adapter
 import { EnvironmentConfigService } from './infrastructure/config/EnvironmentConfigService';
 import { WinstonLogger } from './infrastructure/logging/WinstonLogger';
+import { OpaVsixEngine } from './infrastructure/policy-engine/OpaVsixEngine';
 // Application Services
 import { AuthorizationService } from './application/services/authorization.service';
 
@@ -25,6 +27,7 @@ container.registerSingleton<IPolicySourceAdapter>(TYPES.PolicySourceAdapter, Htt
 
 // --- Register Application Services ---
 container.registerSingleton<IAuthorizationService>(TYPES.AuthorizationService, AuthorizationService);
+container.registerSingleton<IRegoEngine>(TYPES.RegoEngine, { useClass: OpaVsixEngine });
 
 // --- Register Controllers (if needed) ---
 // Ensure controllers are decorated with @injectable()

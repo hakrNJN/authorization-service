@@ -1,5 +1,6 @@
+/*
 import { AbilityBuilder, AbilityClass, ExtractSubjectType, PureAbility } from '@casl/ability'; // Use PureAbility
-import { PermissionDefinition } from '../../application/interfaces/IPolicySourceAdapter'; // Import permission structure
+import { PolicyRule } from '../entities/Policy';
 import { AdminUser } from '../../shared/types/admin-user.interface';
 import { AuthenticatedUser } from '../../shared/types/authenticated-user.interface';
 
@@ -24,7 +25,7 @@ export type AppAbility = PureAbility<[Actions, Subjects]>;
  */
 export function defineAbilitiesForExtractedData(
     subjectContext: AuthenticatedUser | AdminUser | null, // Accept user context or null for guest
-    aggregatedPermissions: PermissionDefinition[]
+    aggregatedPermissions: PolicyRule[]
 ): AppAbility {
     // Use PureAbility instead of the deprecated Ability class
     const { can, cannot, build } = new AbilityBuilder<AppAbility>(PureAbility as AbilityClass<AppAbility>);
@@ -37,49 +38,14 @@ export function defineAbilitiesForExtractedData(
     // This assumes permission names follow a convention like 'resource:action' or similar
     // Or that PermissionDefinition contains explicit action/resource fields.
     aggregatedPermissions.forEach(permission => {
-        // Example parsing logic (adjust based on your permissionName format)
-        const parts = permission.name.split(':');
-        let action: Actions | string = 'manage'; // Default or derive
-        let resource: string = 'all'; // Default or derive
+        const { action, subject, fields, conditions } = permission;
 
-        if (parts.length >= 2) {
-            resource = parts[0];
-            action = parts[1];
-        } else if (parts.length === 1) {
-            // Assume it might be a resource name with implicit 'manage' or a specific action on 'all'
-            // This needs a clear convention. Let's assume resource name for now.
-            resource = parts[0];
-            action = 'manage'; // Example default action
-             console.warn(`Permission '${permission.name}' has only one part, assuming resource name with 'manage' action.`);
-        } else {
-             console.warn(`Could not parse action/resource from permission name: ${permission.name}`);
-             return; // Skip invalid permission names
-        }
-
-        // Validate action if possible
         if (!['read', 'create', 'update', 'delete', 'manage'].includes(action)) {
-             console.warn(`Invalid action '${action}' found in permission name: ${permission.name}`);
-             // Decide how to handle: skip, default, throw? Skipping for now.
-             return;
+            console.warn(`Invalid action '${action}' found in permission`);
+            return;
         }
 
-        // TODO: Implement condition parsing if PermissionDefinition includes conditions
-        // Example: const conditions = permission.condition ? parseCondition(permission.condition) : {};
-        const conditions = {}; // Placeholder for ABAC conditions derived from the permission itself
-
-        // Define the 'can' rule based on the parsed permission
-        // Need to cast action to Actions type after validation
-        can(action as Actions, resource, conditions);
-
-        // Example: Add specific owner-based condition automatically if permission implies ownership
-        // if (permission.name.endsWith(':own')) { // Assuming a naming convention like 'post:update:own'
-        //     const baseResource = resource; // Or parse resource differently
-        //     const baseAction = action;
-        //     if (userId) {
-        //          // Add condition that resource must have an ownerId matching the user
-        //          can(baseAction as Actions, baseResource, { ownerId: userId });
-        //     }
-        // }
+        can(action as Actions, subject, fields, conditions);
     });
 
     // --- Apply Generic Authenticated User Rules (If applicable and not covered by specific perms) ---
@@ -120,3 +86,4 @@ export function defineAbilitiesForExtractedData(
         }
     });
 }
+*/
