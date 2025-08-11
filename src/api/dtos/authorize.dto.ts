@@ -23,6 +23,12 @@ const ResourceSchema = z.union([
  */
 export const AuthorizeSchema = z.object({
     body: z.object({
+        // TODO: Add deeper semantic validation here.
+        // For example, validate 'action' against a known set of actions.
+        // Validate 'resource.type' against known resource types.
+        // Ensure 'context' contains expected fields for specific policy evaluations.
+        // Prevent excessively large 'context' objects.
+
         subject: SubjectSchema,
         action: z.string({ required_error: "Action is required" }).min(1),
         resource: ResourceSchema,

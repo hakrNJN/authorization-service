@@ -3,6 +3,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import helmet from 'helmet'; // Security headers
 import { addRequestId, createErrorMiddleware, createRequestLoggerMiddleware } from './api/middlewares'; // Import middlewares
 import routes from './api/routes'; // Main application routes
+import policyCacheRoutes from './api/routes/policyCache.routes'; // Policy cache invalidation routes
 import { HttpStatusCode } from './application/enums/HttpStatusCode'; // Use status codes
 import { IConfigService } from './application/interfaces/IConfigService';
 import { ILogger } from './application/interfaces/ILogger';
@@ -10,7 +11,34 @@ import { container } from './container';
 import { TYPES } from './shared/constants/types';
 import { RequestContextUtil } from './shared/utils/requestContext'; // Import context utility
 
-export function createApp(): Express { // No need for async if setup is synchronous
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+
+export function createApp(): Express {
+  // Initialize OpenTelemetry tracing here
+  const serviceName = 'authorization-service';
+  const collectorEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'grpc://localhost:4317';
+
+  const traceExporter = new OTLPTraceExporter({
+    url: collectorEndpoint,
+  });
+
+  const spanProcessor = new BatchSpanProcessor(traceExporter);
+
+  const sdk = new NodeSDK({
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
+    }),
+    spanProcessor: spanProcessor,
+    instrumentations: [getNodeAutoInstrumentations()],
+  });
+
+  sdk.start();
+
   const configService = container.resolve<IConfigService>(TYPES.ConfigService);
   const logger = container.resolve<ILogger>(TYPES.Logger);
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
@@ -49,6 +77,7 @@ export function createApp(): Express { // No need for async if setup is synchron
   // --- API Routes ---
   // All routes defined in './api/routes' will have access to req.id and context
   app.use('/api', routes); // 7. Your main application routes
+  app.use('/api/admin', policyCacheRoutes); // 8. Policy cache invalidation endpoint
 
 
   // --- Catch-all for 404 Not Found ---
