@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { container } from '../../container';
-import { IConfigService } from '../../infrastructure/config/interfaces/IConfigService';
+import { IConfigService } from 'application/interfaces/IConfigService';
 import { TYPES } from '../../shared/constants/types';
 import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
 

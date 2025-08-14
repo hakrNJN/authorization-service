@@ -1,6 +1,6 @@
-import { IRegoEngine, RegoEvaluationResult } from "../../application/interfaces/IRegoEngine";
-import { ILogger } from "../../application/interfaces/ILogger";
-import { TYPES } from "../../shared/constants/types";
+import { IRegoEngine, RegoEvaluationResult } from "application/interfaces/IRegoEngine";
+import { ILogger } from "application/interfaces/ILogger";
+import { TYPES } from "shared/constants/types";
 import { inject, injectable } from "tsyringe";
 import { OpaRuntime } from '@open-policy-agent/opa-wasm';
 

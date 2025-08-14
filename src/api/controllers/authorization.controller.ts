@@ -6,6 +6,7 @@ import { ILogger } from '../../application/interfaces/ILogger';
 import { PermissionCheck } from '../../domain/entities/PermissionCheck'; // Domain entity
 import { TYPES } from '../../shared/constants/types';
 import { AuthorizeDto } from '../dtos/authorize.dto'; // DTO for the request body
+import { TestPolicyRequestDto, TestPolicyRequestSchema, TestPolicyResponseDto } from '../dtos/test-policy.dto';
 
 @injectable()
 export class AuthorizationController {
@@ -45,4 +46,24 @@ export class AuthorizationController {
             next(error);
         }
     };
+
+    /**
+     * Handles requests to test a Rego policy with provided input.
+     * POST /test-policy
+     */
+    testPolicy = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const requestId = req.id || 'N/A';
+        try {
+            // Assuming validation middleware has run and req.body is TestPolicyRequestDto
+            const { policy, input, query }: TestPolicyRequestDto = req.body;
+
+            const result: TestPolicyResponseDto = await this.authorizationService.testPolicy(policy, input, query);
+
+            res.status(HttpStatusCode.OK).json(result);
+        } catch (error) {
+            this.logger.error(`[AuthorizationController - ${requestId}] Error testing policy`, error);
+            next(error);
+        }
+    };
 }
+

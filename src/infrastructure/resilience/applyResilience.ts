@@ -28,9 +28,9 @@ export function applyCircuitBreaker<TArgs extends any[], TReturn>(
         breaker.on('open', () => logger.warn(`CircuitBreaker (${serviceName}) opened. Service failing.`));
         breaker.on('close', () => logger.info(`CircuitBreaker (${serviceName}) closed. Service restored.`));
         breaker.on('halfOpen', () => logger.info(`CircuitBreaker (${serviceName}) halfOpen. Attempting test request.`));
-        breaker.on('fallback', (result, error) => logger.warn(`CircuitBreaker (${serviceName}) fallback executed.`, { result, error: error?.message }));
-        breaker.on('failure', (error) => logger.error(`CircuitBreaker (${serviceName}) failure detected.`, error));
-        breaker.on('success', (result) => logger.debug(`CircuitBreaker (${serviceName}) success.` /*, { result } - avoid logging potentially large results */));
+        breaker.on('fallback', (result: any, error: any) => logger.warn(`CircuitBreaker (${serviceName}) fallback executed.`, { result, error: error?.message }));
+        breaker.on('failure', (error: any) => logger.error(`CircuitBreaker (${serviceName}) failure detected.`, error));
+        breaker.on('success', (result: any) => logger.debug(`CircuitBreaker (${serviceName}) success.` /*, { result } - avoid logging potentially large results */));
         breaker.on('timeout', () => logger.warn(`CircuitBreaker (${serviceName}) timed out.`));
         breaker.on('reject', () => logger.warn(`CircuitBreaker (${serviceName}) rejected.`)); // When open or half-open and called
     }

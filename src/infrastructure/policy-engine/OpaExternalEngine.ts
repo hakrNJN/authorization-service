@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import { IRegoEngine, RegoEvaluationResult } from '../../../application/interfaces/IRegoEngine';
-import { IConfigService } from '../../../application/interfaces/IConfigService';
-import { ILogger } from '../../../application/interfaces/ILogger';
-import { TYPES } from '../../../shared/constants/types';
+import { IRegoEngine, RegoEvaluationResult } from 'application/interfaces/IRegoEngine';
+import { IConfigService } from 'application/interfaces/IConfigService';
+import { ILogger } from 'application/interfaces/ILogger';
+import { TYPES } from 'shared/constants/types';
 import axios from 'axios';
 
 // TODO: Ensure that the policies being evaluated by the external OPA instance are thoroughly tested and linted.

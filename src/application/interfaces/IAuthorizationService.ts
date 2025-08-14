@@ -15,6 +15,17 @@ export interface IAuthorizationService {
      */
     checkPermission(check: PermissionCheck): Promise<AuthorizationDecision>;
 
+    /**
+     * Evaluates a given Rego policy with provided input data and query.
+     * This is intended for testing and debugging policies.
+     * @param policy - The Rego policy string to evaluate.
+     * @param input - The input data for the policy evaluation.
+     * @param query - The Rego query to execute (e.g., "data.my_policy.allow").
+     * @returns A promise resolving to the raw evaluation result from the Rego engine.
+     * @throws {PolicyEvaluationError | BaseError} For evaluation failures or unexpected errors.
+     */
+    testPolicy(policy: string, input: unknown, query?: string): Promise<any>;
+
     // Potentially add other methods if needed, e.g.:
     // listPermissions(subject: UserContext): Promise<Permission[]>;
     // reloadPolicies(): Promise<void>; // If policies are loaded dynamically

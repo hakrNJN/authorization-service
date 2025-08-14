@@ -1,9 +1,9 @@
 import { inject, injectable } from 'tsyringe';
-import { IPolicySourceAdapter } from '../../../application/interfaces/IPolicySourceAdapter';
-import { IConfigService } from '../../../application/interfaces/IConfigService';
-import { ILogger } from '../../../application/interfaces/ILogger';
-import { TYPES } from '../../../shared/constants/types';
-import { Policy } from '../../../domain/entities/Policy';
+import { IPolicySourceAdapter, PermissionDefinition } from 'application/interfaces/IPolicySourceAdapter';
+import { IConfigService } from 'application/interfaces/IConfigService';
+import { ILogger } from 'application/interfaces/ILogger';
+import { TYPES } from 'shared/constants/types';
+import { Policy } from 'domain/entities/Policy';
 import axios from 'axios';
 
 // TODO: For Wasm engine, this adapter should fetch compiled Wasm policy bundles instead of raw Rego policies.
@@ -46,5 +46,31 @@ export class HttpPolicySourceAdapter implements IPolicySourceAdapter {
     public invalidateCache(): void {
         cache.delete('policies');
         this.logger.info('Policy cache invalidated.');
+    }
+
+    // Dummy implementations to satisfy IPolicySourceAdapter interface
+    async getGroupsForUser(userId: string): Promise<string[]> {
+        this.logger.warn(`Dummy implementation: getGroupsForUser called for userId: ${userId}`);
+        return Promise.resolve([]);
+    }
+
+    async getRolesForGroup(groupName: string): Promise<string[]> {
+        this.logger.warn(`Dummy implementation: getRolesForGroup called for groupName: ${groupName}`);
+        return Promise.resolve([]);
+    }
+
+    async getCustomRolesForUser(userId: string): Promise<string[]> {
+        this.logger.warn(`Dummy implementation: getCustomRolesForUser called for userId: ${userId}`);
+        return Promise.resolve([]);
+    }
+
+    async getPermissionsForRole(roleName: string): Promise<PermissionDefinition[]> {
+        this.logger.warn(`Dummy implementation: getPermissionsForRole called for roleName: ${roleName}`);
+        return Promise.resolve([]);
+    }
+
+    async getCustomPermissionsForUser(userId: string): Promise<PermissionDefinition[]> {
+        this.logger.warn(`Dummy implementation: getCustomPermissionsForUser called for userId: ${userId}`);
+        return Promise.resolve([]);
     }
 }

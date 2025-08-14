@@ -35,7 +35,7 @@ export class AuthorizationService implements IAuthorizationService {
 
             // For simplicity, this example uses the first policy. A real implementation
             // would need a strategy to select the correct policy.
-            const policy = policies[0].rules.map(rule => rule.policy).join('\n');
+            const policy = policies[0].policy;
 
             const input = {
                 subject: check.subject,
@@ -64,6 +64,26 @@ export class AuthorizationService implements IAuthorizationService {
                 throw error;
             }
             throw new PolicyEvaluationError(`Failed to evaluate permission: ${error.message}`, error);
+        }
+    }
+
+    public async testPolicy(policy: string, input: unknown, query: string = 'data.authz.allow'): Promise<any> {
+        this.logger.debug('Testing policy', { policyLength: policy.length, input, query });
+
+        try {
+            if (!policy) {
+                throw new ValidationError('Policy string cannot be empty for testing.');
+            }
+            // The regoEngine.evaluate method is designed to take the raw policy string
+            const result = await this.regoEngine.evaluate(policy, input, query);
+            this.logger.info('Policy test evaluation completed.', { query, result });
+            return result;
+        } catch (error: any) {
+            this.logger.error('Error during policy test evaluation', { error });
+            if (error instanceof ValidationError) {
+                throw error;
+            }
+            throw new PolicyEvaluationError(`Failed to test policy: ${error.message}`, error);
         }
     }
 }
