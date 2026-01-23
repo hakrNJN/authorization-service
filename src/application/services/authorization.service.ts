@@ -33,9 +33,22 @@ export class AuthorizationService implements IAuthorizationService {
                 throw new PolicyLoadError('No policies found.');
             }
 
-            // For simplicity, this example uses the first policy. A real implementation
-            // would need a strategy to select the correct policy.
-            const policy = policies[0].policy;
+            // Strategy: Select policy based on the resource name, or fall back to 'default' or 'main'.
+            // If the resource is 'accounts', look for a policy named 'accounts' or 'policy.accounts'.
+            const resourceName = typeof check.resource === 'string' ? check.resource : check.resource.type;
+            let policyEntity = policies.find(p => p.policyName === resourceName || p.policyName === `policy.${resourceName}`);
+
+            if (!policyEntity) {
+                // Fallback to a default policy if it exists
+                policyEntity = policies.find(p => p.policyName === 'default' || p.policyName === 'main' || p.policyName === 'policy.main');
+            }
+
+            if (!policyEntity) {
+                this.logger.warn(`No matching policy found for resource '${check.resource}' and no default policy available. Denying access.`);
+                return { allowed: false, reason: 'No applicable policy found' };
+            }
+
+            const policyDefinition = policyEntity.policyDefinition;
 
             const input = {
                 subject: check.subject,
@@ -44,7 +57,7 @@ export class AuthorizationService implements IAuthorizationService {
                 context: check.context,
             };
 
-            const result = await this.regoEngine.evaluate(policy, input);
+            const result = await this.regoEngine.evaluate(policyDefinition, input);
 
             const decision: AuthorizationDecision = {
                 allowed: result.allow,

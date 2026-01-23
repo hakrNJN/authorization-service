@@ -5,7 +5,7 @@ import { TYPES } from './shared/constants/types';
 import { IAuthorizationService } from './application/interfaces/IAuthorizationService';
 import { IConfigService } from './application/interfaces/IConfigService';
 import { ILogger } from './application/interfaces/ILogger';
-import { IPolicySourceAdapter } from './application/interfaces/IPolicySourceAdapter'; // Import new interface
+import { IPolicyRepository } from './application/interfaces/IPolicyRepository';
 import { IRegoEngine } from './application/interfaces/IRegoEngine';
 
 // --- Import Implementations ---
@@ -20,12 +20,12 @@ import { AuthorizationService } from './application/services/authorization.servi
 
 // --- Register Infrastructure Services ---
 container.registerSingleton<ILogger>(TYPES.Logger, WinstonLogger);
-const configService = container.resolve<IConfigService>(TYPES.ConfigService);
 container.registerSingleton<IConfigService>(TYPES.ConfigService, EnvironmentConfigService);
+const configService = container.resolve<IConfigService>(TYPES.ConfigService);
 
 // --- Register Adapters ---
-// Register the implementation for fetching policy data
-container.registerSingleton<IPolicySourceAdapter>(TYPES.PolicySourceAdapter, HttpPolicySourceAdapter);
+// Register the implementation for fetching policy data - FIXED: Binding to PolicyRepository
+container.registerSingleton<IPolicyRepository>(TYPES.PolicyRepository, HttpPolicySourceAdapter);
 
 // --- Register Application Services ---
 container.registerSingleton<IAuthorizationService>(TYPES.AuthorizationService, AuthorizationService);

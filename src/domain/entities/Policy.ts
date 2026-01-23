@@ -1,20 +1,34 @@
-
 export class Policy {
     id: string;
-    name: string;
-    policy: string; // This will store the Rego policy
+    policyName: string;
+    policyDefinition: string; // The Rego policy code
+    policyLanguage: string;
+    version: number;
 
-    constructor(id: string, name: string, policy: string) {
+    constructor(id: string, policyName: string, policyDefinition: string, policyLanguage: string, version: number) {
         this.id = id;
-        this.name = name;
-        this.policy = policy;
+        this.policyName = policyName;
+        this.policyDefinition = policyDefinition;
+        this.policyLanguage = policyLanguage;
+        this.version = version;
     }
 
     static fromPersistence(data: any): Policy {
-        // Assuming 'data' has 'id', 'name', 'policy' properties
-        if (!data.id || !data.name || !data.policy) {
-            throw new Error('Invalid policy data for persistence.');
+        // Validation to ensure data contract is met
+        if (!data.id || !data.policyName || !data.policyDefinition) {
+            // Fallback for transition if needed, or throw
+            if (data.name && data.policy) {
+                 // Attempt to adapt old format if mixed env (unlikely but safe)
+                 return new Policy(data.id, data.name, data.policy, 'rego', 1);
+            }
+            throw new Error('Invalid policy data for persistence: Missing required fields (id, policyName, policyDefinition).');
         }
-        return new Policy(data.id, data.name, data.policy);
+        return new Policy(
+            data.id, 
+            data.policyName, 
+            data.policyDefinition, 
+            data.policyLanguage || 'rego', 
+            data.version || 1
+        );
     }
 }

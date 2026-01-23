@@ -17,11 +17,15 @@ module.exports = {
     coverageProvider: 'v8', // Or 'babel' if you prefer
     coverageReporters: ['text', 'lcov', 'clover'],
     // Optional: Setup files to run before each test file
-    // setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+    setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
     // Optional: Module name mapping for aliases in tsconfig.json
-    // moduleNameMapper: {
-    //   '^@/(.*)$': '<rootDir>/src/$1',
-    // },
+    moduleNameMapper: {
+      "^application/(.*)$": "<rootDir>/src/application/$1",
+      "^domain/(.*)$": "<rootDir>/src/domain/$1",
+      "^infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
+      "^shared/(.*)$": "<rootDir>/src/shared/$1",
+      "^api/(.*)$": "<rootDir>/src/api/$1"
+    },
     verbose: true,
     clearMocks: true,
 };

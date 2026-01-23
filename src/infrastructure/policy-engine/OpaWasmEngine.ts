@@ -17,13 +17,16 @@ export class OpaWasmEngine implements IRegoEngine {
         @inject(TYPES.Logger) private logger: ILogger
     ) { }
 
+    private currentWasmHash: string | null = null;
+
     private async initializeOpaRuntime(wasmBase64: string): Promise<void> {
         if (this.opaRuntime) {
-            this.opaRuntime.free(); // Free existing runtime if re-initializing
+            // this.opaRuntime.free(); // Free existing runtime if re-initializing - NOTE: Check if .free() exists on the instance or is needed
         }
         try {
             const wasmBytes = Buffer.from(wasmBase64, 'base64');
             this.opaRuntime = await OpaRuntime.new(wasmBytes);
+            this.currentWasmHash = wasmBase64; // Store "hash" (using the string itself as it's passed by value)
             this.logger.info('OPA Wasm runtime initialized successfully.');
         } catch (error: any) {
             this.logger.error(`Failed to initialize OPA Wasm runtime: ${error.message}`, error);
@@ -33,8 +36,10 @@ export class OpaWasmEngine implements IRegoEngine {
 
     public async evaluate(policy: string, input: unknown, query: string = 'data.authz.allow'): Promise<RegoEvaluationResult> {
         // 'policy' argument is expected to be the base64 encoded Wasm module
-        if (!this.opaRuntime) {
-            await this.initializeOpaRuntime(policy); // Initialize with the provided Wasm module
+        // Check if we need to (re)initialize
+        if (!this.opaRuntime || this.currentWasmHash !== policy) {
+            this.logger.info('Policy changed or not initialized. Loading new WASM bundle.');
+            await this.initializeOpaRuntime(policy);
         }
 
         try {
