@@ -4,6 +4,11 @@
  */
 export interface PermissionCheck {
     /**
+     * The unique identifier for the tenant context of this check.
+     */
+    tenantId: string;
+
+    /**
      * Information about the user/subject attempting the action.
      * Derived from the validated JWT claims passed by the gateway.
      */
@@ -25,7 +30,7 @@ export interface PermissionCheck {
      * Can be a simple string (e.g., 'UserProfile', 'Order') or an object
      * with more details (e.g., { type: 'Order', id: '123', ownerId: 'abc' }).
      */
-    resource: string | { type: string; id?: string; [key: string]: any };
+    resource: string | { type: string; id?: string;[key: string]: any };
 
     /**
      * Optional: Additional environmental context (e.g., IP address, time of day).

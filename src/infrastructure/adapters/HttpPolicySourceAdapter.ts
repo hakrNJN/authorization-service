@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { IPolicyRepository } from 'application/interfaces/IPolicyRepository';
 import { IConfigService } from 'application/interfaces/IConfigService';
+import { ICacheAdapter } from 'application/interfaces/ICacheAdapter';
 import { ILogger } from 'application/interfaces/ILogger';
 import { TYPES } from 'shared/constants/types';
 import { Policy } from 'domain/entities/Policy';
@@ -14,8 +15,7 @@ export interface PermissionDefinition {
     resource: string;
 }
 
-const cache = new Map<string, { policies: Policy[], timestamp: number }>();
-const CACHE_TTL = 60000; // 1 minute
+const CACHE_KEY = 'authorization:policies';
 
 @injectable()
 export class HttpPolicySourceAdapter implements IPolicyRepository {
@@ -25,7 +25,8 @@ export class HttpPolicySourceAdapter implements IPolicyRepository {
 
     constructor(
         @inject(TYPES.ConfigService) private configService: IConfigService,
-        @inject(TYPES.Logger) private logger: ILogger
+        @inject(TYPES.Logger) private logger: ILogger,
+        @inject(TYPES.CacheAdapter) private cacheAdapter: ICacheAdapter
     ) {
         this.userManagementServiceUrl = this.configService.getOrThrow('USER_MANAGEMENT_SERVICE_URL');
         this.httpClient = axios.create({
@@ -33,7 +34,7 @@ export class HttpPolicySourceAdapter implements IPolicyRepository {
             timeout: this.configService.getNumber('POLICY_SOURCE_TIMEOUT_MS', 5000),
         });
         // Clear cache on startup
-        cache.clear();
+        this.cacheAdapter.clear();
     }
 
     private async makeRequest<T>(config: { method: 'get', url: string }, operationName: string): Promise<T> {
@@ -65,10 +66,10 @@ export class HttpPolicySourceAdapter implements IPolicyRepository {
     }
 
     async getPolicies(): Promise<Policy[]> {
-        const cachedData = cache.get('policies');
-        if (cachedData && (Date.now() - cachedData.timestamp < CACHE_TTL)) {
+        const cachedPolicies = await this.cacheAdapter.get<Policy[]>(CACHE_KEY);
+        if (cachedPolicies) {
             this.logger.info('Returning policies from cache');
-            return cachedData.policies;
+            return cachedPolicies;
         }
 
         try {
@@ -85,7 +86,7 @@ export class HttpPolicySourceAdapter implements IPolicyRepository {
             }
 
             const policies = response.items.map((item: any) => Policy.fromPersistence(item));
-            cache.set('policies', { policies, timestamp: Date.now() });
+            await this.cacheAdapter.set(CACHE_KEY, policies);
             return policies;
         } catch (error: any) {
             // Already logged in makeRequest, but re-throw or handle specific policy load logic
@@ -167,8 +168,8 @@ export class HttpPolicySourceAdapter implements IPolicyRepository {
         throw new Error('Method not implemented in Authorization Service (Read-Only).');
     }
 
-    public invalidateCache(): void {
-        cache.delete('policies');
+    public async invalidateCache(): Promise<void> {
+        await this.cacheAdapter.delete(CACHE_KEY);
         this.logger.info('Policy cache invalidated.');
     }
 }

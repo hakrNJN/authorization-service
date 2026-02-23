@@ -23,6 +23,13 @@ container.registerSingleton<ILogger>(TYPES.Logger, WinstonLogger);
 container.registerSingleton<IConfigService>(TYPES.ConfigService, EnvironmentConfigService);
 const configService = container.resolve<IConfigService>(TYPES.ConfigService);
 
+// --- Register Cache Adapter ---
+import { ICacheAdapter } from './application/interfaces/ICacheAdapter';
+import { createCacheAdapter } from './infrastructure/cache/CacheAdapterFactory';
+const logger = container.resolve<ILogger>(TYPES.Logger);
+const cacheAdapter = createCacheAdapter(configService, logger);
+container.registerInstance<ICacheAdapter>(TYPES.CacheAdapter, cacheAdapter);
+
 // --- Register Adapters ---
 // Register the implementation for fetching policy data - FIXED: Binding to PolicyRepository
 container.registerSingleton<IPolicyRepository>(TYPES.PolicyRepository, HttpPolicySourceAdapter);

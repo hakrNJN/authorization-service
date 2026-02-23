@@ -86,6 +86,7 @@ describe("Authorization Routes", () => {
 
     describe("POST /authorize", () => {
         const validAuthRequest = {
+            tenantId: "test-tenant",
             subject: { id: "user123", roles: ["user"] },
             action: "read",
             resource: { type: "document", id: "doc1" },

@@ -51,6 +51,7 @@ export class AuthorizationService implements IAuthorizationService {
             const policyDefinition = policyEntity.policyDefinition;
 
             const input = {
+                tenantId: check.tenantId,
                 subject: check.subject,
                 action: check.action,
                 resource: check.resource,

@@ -46,6 +46,7 @@ describe("AuthorizationService", () => {
 
     describe("checkPermission", () => {
         const mockPermissionCheck: PermissionCheck = {
+            tenantId: "test-tenant",
             subject: { id: "user123", roles: ["admin"] },
             action: "read",
             resource: { type: "document", id: "doc456" },
@@ -72,6 +73,7 @@ allow = true`,
             expect(mockRegoEngine.evaluate).toHaveBeenCalledWith(
                 mockPolicy.policyDefinition,
                 {
+                    tenantId: "test-tenant",
                     subject: mockPermissionCheck.subject,
                     action: mockPermissionCheck.action,
                     resource: mockPermissionCheck.resource,
@@ -96,6 +98,7 @@ allow = true`,
             expect(mockRegoEngine.evaluate).toHaveBeenCalledWith(
                 mockPolicy.policyDefinition,
                 {
+                    tenantId: "test-tenant",
                     subject: mockPermissionCheck.subject,
                     action: mockPermissionCheck.action,
                     resource: mockPermissionCheck.resource,

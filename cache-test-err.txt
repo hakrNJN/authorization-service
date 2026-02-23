@@ -1,0 +1,25 @@
+FAIL tests/unit/infrastructure/cache/InMemoryCacheAdapter.test.ts
+  ΓùÅ Test suite failed to run
+
+    tsyringe requires a reflect polyfill. Please add 'import "reflect-metadata"' to the top of your entry point.
+
+    > 1 | import { injectable } from 'tsyringe';
+        | ^
+      2 | import { ICacheAdapter } from '../../application/interfaces/ICacheAdapter';
+      3 |
+      4 | interface CacheEntry<T = any> {
+
+      at Object.<anonymous> (node_modules/.pnpm/tsyringe@4.10.0/node_modules/tsyringe/dist/cjs/index.js:5:11)
+      at Object.<anonymous> (src/infrastructure/cache/InMemoryCacheAdapter.ts:1:1)
+      at Object.<anonymous> (tests/unit/infrastructure/cache/InMemoryCacheAdapter.test.ts:1:1)
+
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------|---------|----------|---------|---------|-------------------
+All files |       0 |        0 |       0 |       0 |                   
+----------|---------|----------|---------|---------|-------------------
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        27.182 s
+Ran all test suites matching /InMemoryCacheAdapter/i.

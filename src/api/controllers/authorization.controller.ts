@@ -13,7 +13,7 @@ export class AuthorizationController {
     constructor(
         @inject(TYPES.AuthorizationService) private authorizationService: IAuthorizationService,
         @inject(TYPES.Logger) private logger: ILogger,
-    ) {}
+    ) { }
 
     /**
      * Handles authorization check requests from the Gateway.
@@ -27,6 +27,7 @@ export class AuthorizationController {
 
             // Map DTO to the PermissionCheck domain entity
             const permissionCheck: PermissionCheck = {
+                tenantId: authorizeDto.tenantId,
                 subject: authorizeDto.subject,
                 action: authorizeDto.action,
                 resource: authorizeDto.resource,

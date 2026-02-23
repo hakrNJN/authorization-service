@@ -29,6 +29,7 @@ export const AuthorizeSchema = z.object({
         // Ensure 'context' contains expected fields for specific policy evaluations.
         // Prevent excessively large 'context' objects.
 
+        tenantId: z.string({ required_error: "Tenant ID is required" }).min(1),
         subject: SubjectSchema,
         action: z.string({ required_error: "Action is required" }).min(1),
         resource: ResourceSchema,

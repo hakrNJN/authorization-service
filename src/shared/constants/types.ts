@@ -11,6 +11,7 @@ export const TYPES = {
     PolicySourceAdapter: Symbol.for('PolicySourceAdapter'),
     PolicyService: Symbol.for('PolicyService'),
     RegoEngine: Symbol.for('RegoEngine'),
+    CacheAdapter: Symbol.for('CacheAdapter'),
 
     // Middlewares
     ErrorMiddleware: Symbol.for('ErrorMiddleware'),

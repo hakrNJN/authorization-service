@@ -1,0 +1,38 @@
+PASS tests/unit/infrastructure/cache/CacheAdapterFactory.test.ts (59.109 s)
+  CacheAdapterFactory
+    ΓêÜ should create InMemoryCacheAdapter by default (26 ms)
+    ΓêÜ should create InMemoryCacheAdapter when CACHE_PROVIDER is undefined (1 ms)
+    ΓêÜ should be case-insensitive for provider name (1 ms)
+    ΓêÜ should fall back to InMemory for unknown provider (1 ms)
+    ΓêÜ should use custom TTL from config (1 ms)
+
+PASS tests/unit/infrastructure/cache/InMemoryCacheAdapter.test.ts (59.352 s)
+  InMemoryCacheAdapter
+    set and get
+      ΓêÜ should store and retrieve a value (23 ms)
+      ΓêÜ should return null for a non-existent key (1 ms)
+      ΓêÜ should store and retrieve primitive values (1 ms)
+      ΓêÜ should store and retrieve arrays (1 ms)
+      ΓêÜ should overwrite existing value (1 ms)
+    TTL expiration
+      ΓêÜ should return null after TTL expires (74 ms)
+      ΓêÜ should respect custom TTL per set() (63 ms)
+      ΓêÜ should use default TTL when not specified (76 ms)
+    delete
+      ΓêÜ should delete an existing key and return true (1 ms)
+      ΓêÜ should return false when deleting a non-existent key (1 ms)
+    clear
+      ΓêÜ should clear all entries (2 ms)
+
+-------------------------|---------|----------|---------|---------|-------------------
+File                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------------|---------|----------|---------|---------|-------------------
+All files                |   91.83 |    83.33 |     100 |   91.83 |                   
+ CacheAdapterFactory.ts  |   83.67 |    57.14 |     100 |   83.67 | 34-37,40-43       
+ InMemoryCacheAdapter.ts |     100 |      100 |     100 |     100 |                   
+-------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 2 passed, 2 total
+Tests:       16 passed, 16 total
+Snapshots:   0 total
+Time:        62.842 s
+Ran all test suites matching /infrastructure\\cache/i.
