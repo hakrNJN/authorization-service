@@ -26,9 +26,19 @@ const configService = container.resolve<IConfigService>(TYPES.ConfigService);
 // --- Register Cache Adapter ---
 import { ICacheAdapter } from './application/interfaces/ICacheAdapter';
 import { createCacheAdapter } from './infrastructure/cache/CacheAdapterFactory';
+import { EventBusFactory } from './infrastructure/events/EventBusFactory';
+import { IEventBus } from './application/interfaces/IEventBus';
 const logger = container.resolve<ILogger>(TYPES.Logger);
 const cacheAdapter = createCacheAdapter(configService, logger);
 container.registerInstance<ICacheAdapter>(TYPES.CacheAdapter, cacheAdapter);
+
+// --- Register Event Bus ---
+container.registerSingleton(EventBusFactory);
+container.register<IEventBus>(TYPES.EventBus, {
+    useFactory: () => {
+        return EventBusFactory.createEventBus();
+    }
+});
 
 // --- Register Adapters ---
 // Register the implementation for fetching policy data - FIXED: Binding to PolicyRepository

@@ -24,6 +24,23 @@ async function bootstrap() {
         // Delegate app creation and configuration to the createApp function
         const app = createApp();
 
+        // --- Subscribe to Inter-Service Telemetry (Event Bus) ---
+        try {
+            const eventBus = container.resolve<import('./application/interfaces/IEventBus').IEventBus>(TYPES.EventBus);
+            const policyRepo = container.resolve<any>(TYPES.PolicyRepository);
+
+            eventBus.subscribe('UserCreatedEvent', async (eventData: any) => {
+                logger?.info(`[Telemetry] Received UserCreatedEvent for user ${eventData.userId || 'unknown'}. Eagerly invalidating policy cache.`);
+                if (typeof policyRepo.invalidateCache === 'function') {
+                    await policyRepo.invalidateCache();
+                }
+            }).catch(eventBusErr => {
+                logger?.error('Failed to subscribe to UserCreatedEvent', { error: eventBusErr });
+            });
+        } catch (err) {
+            logger?.warn('EventBus not configured or failed to initialize, running without telemetry subscriptions.', { error: err });
+        }
+
         // --- Server Startup ---
         const port = configService.getNumber('PORT'); // Already validated in ConfigService constructor
 
@@ -81,7 +98,7 @@ async function bootstrap() {
                 message: 'An uncaught exception occurred. The application is exiting.'
             });
             logger?.info('Exiting due to uncaught exception...');
-             // Attempt a quick log flush before exiting
+            // Attempt a quick log flush before exiting
             setTimeout(() => process.exit(1), 500);
         });
 
