@@ -1,31 +1,38 @@
+const dotenv = require('dotenv');
+dotenv.config({ path: '.env.test', override: true });
+
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    roots: ['<rootDir>/src', '<rootDir>/tests'],
+    roots: ['<rootDir>/tests/unit'],
     testMatch: [
-        '**/tests/**/*.test.ts',
-        '**/tests/**/*.spec.ts',
-        '**/?(*.)+(spec|test).ts',
+        '**/tests/unit/**/*.test.ts',
+        '**/tests/unit/**/*.spec.ts',
     ],
     transform: {
         '^.+\\.ts$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-    collectCoverage: true,
+    collectCoverageFrom: [
+        'src/**/*.{ts,js}',
+        '!src/main.ts',
+        '!src/container.ts',
+        '!src/**/index.ts',
+        '!src/**/*.d.ts',
+    ],
     coverageDirectory: 'coverage',
-    coverageProvider: 'v8', // Or 'babel' if you prefer
-    coverageReporters: ['text', 'lcov', 'clover'],
-    // Optional: Setup files to run before each test file
+    coverageReporters: ['text', 'text-summary', 'lcov'],
     setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
-    // Optional: Module name mapping for aliases in tsconfig.json
     moduleNameMapper: {
-      "^application/(.*)$": "<rootDir>/src/application/$1",
-      "^domain/(.*)$": "<rootDir>/src/domain/$1",
-      "^infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
-      "^shared/(.*)$": "<rootDir>/src/shared/$1",
-      "^api/(.*)$": "<rootDir>/src/api/$1"
+        "^application/(.*)$": "<rootDir>/src/application/$1",
+        "^domain/(.*)$": "<rootDir>/src/domain/$1",
+        "^infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",
+        "^shared/(.*)$": "<rootDir>/src/shared/$1",
+        "^api/(.*)$": "<rootDir>/src/api/$1"
     },
-    verbose: true,
     clearMocks: true,
+    resetMocks: false,
+    restoreMocks: true,
+    maxWorkers: 1,
 };
