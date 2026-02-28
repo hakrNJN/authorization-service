@@ -1,23 +1,50 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20-alpine
+# Stage 1: Build stage
+FROM node:20-alpine AS builder
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Install pnpm
+RUN npm install -g pnpm
 
-# Copy package.json and pnpm-lock.yaml to the working directory
+WORKDIR /app
+
+# Copy dependency definition files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --prod
+# Install all dependencies including devDependencies needed for build
+RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the application code
+# Copy the rest of the application source code
 COPY . .
 
-# Build the TypeScript code
+# Build the TypeScript application
 RUN pnpm run build
 
-# Expose the port the app runs on
+# Stage 2: Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Install pnpm for running prod install
+RUN npm install -g pnpm
+
+# Copy dependency definition files
+COPY package.json pnpm-lock.yaml ./
+
+# Install ONLY production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built application from the builder stage
+COPY --from=builder /app/dist ./dist
+
+# Ensure the non-root user owns the application files
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
 EXPOSE 3000
 
-# Define the command to run the app
+# Command to run the application
 CMD ["node", "dist/main.js"]
